@@ -83,4 +83,83 @@ Utilizados para o desenvolvimento da interface web simples do sistema, responsá
 ### Backend
 🔹 **Python + FastAPI + Flask**
 Responsável por receber as requisições da interface web, centralizar a lógica do sistema, orquestrar a comunicação com o agente de IA e gerenciar a persistência dos dados no banco.
-*(Obs.: Flask pode ser citado como alternativa, porém o FastAPI é a opção
+*(Obs.: Flask pode ser citado como alternativa, porém o FastAPI é a opção principal).*
+
+### Agente de IA (LLM)
+🔹 **Google Gemini**
+* **Modelos:** Gemini 1.5 Flash ou Gemini Pro
+* Utilizado para análise da descrição do chamado, avaliação da qualidade das informações fornecidas, atribuição de nota e geração de orientações e sugestões ao usuário.
+
+### Banco de Dados
+🔹 **SQLite**
+Banco de dados leve e gratuito, utilizado para armazenar as descrições dos chamados, as notas atribuídas e os feedbacks gerados pelo agente de IA, permitindo histórico e testes do MVP sem necessidade de infraestrutura adicional.
+
+---
+
+## 3. Fluxo de Dados
+
+1.  **Entrada do Usuário (Frontend):** O usuário acessa a interface web e insere livremente a descrição do problema no campo de texto. Após finalizar, aciona o botão de análise.
+2.  **Envio da Descrição ao Backend:** A descrição é enviada do frontend para o backend via HTTP.
+3.  **Processamento no Backend:** O backend recebe a descrição, realiza validações básicas (texto vazio, tamanho mínimo) e organiza os dados.
+4.  **Análise pelo Agente de IA:** A descrição é encaminhada ao agente, que analisa o conteúdo, atribui uma nota e gera feedbacks/sugestões.
+5.  **Retorno do Resultado ao Backend:** O agente retorna a nota, o feedback e as orientações.
+6.  **Persistência dos Dados (Opcional):** O backend armazena a descrição original, nota e feedback no banco de dados.
+7.  **Exibição do Resultado (Frontend):** O backend envia o resultado ao frontend, que exibe a nota e o feedback ao usuário na mesma interface.
+
+---
+
+## 4. Camadas do Sistema
+
+### Interface Web (Frontend)
+* **Campo de Entrada:** Caixa de texto grande com placeholder "Descreva o problema com o máximo de detalhes possível".
+* **Ação de Envio:** Botão "Avaliar descrição". Exibe status "analisando..." durante o processo.
+* **Área de Retorno:** Exibe a nota (0-10), feedback e sugestões de melhoria/testes sem sair da página.
+
+### Backend Leve
+* Receber a descrição da interface web.
+* Encaminhar ao agente de IA.
+* Receber nota e feedback.
+* Gerenciar comunicação entre camadas e centralizar a lógica.
+
+### Agente de IA
+* Componente responsável pela inteligência.
+* Analisa o texto baseando-se na estrutura definida.
+* Atribui nota de clareza/completude.
+* Gera orientações para complementar o chamado.
+
+### Banco de Dados
+* Armazena descrições, notas e respostas para histórico e validação do MVP.
+* Solução simples (SQLite) para evitar complexidade desnecessária.
+
+---
+
+## 5. Plano de Desenvolvimento
+
+### Etapa 1 — Desenvolvimento do Frontend
+* Criação da interface web simples (HTML/CSS/JS/Bootstrap).
+* Campo de texto, botão de envio e área de exibição de resultados.
+* Integração básica via HTTP.
+
+### Etapa 2 — Desenvolvimento do Backend
+* Criação da API utilizando FastAPI.
+* Endpoints para recebimento e retorno de dados.
+* Validações básicas e centralização da lógica.
+
+### Etapa 3 — Implementação do Agente de IA
+* Integração com Google Gemini.
+* Definição de Prompt Engineering (entrada/saída).
+* Lógica de análise, pontuação e geração de feedback.
+
+### Etapa 4 — Persistência de Dados
+* Configuração do SQLite.
+* Estrutura de tabelas (descrição, nota, feedback, data).
+* Implementação do salvamento.
+
+### Etapa 5 — Integração End-to-End
+* Conexão completa Frontend <-> Backend <-> IA <-> Banco.
+* Testes do fluxo completo.
+
+### Etapa 6 — Testes e Validação do MVP
+* Testes com descrições variadas.
+* Ajuste de coerência das notas e feedbacks.
+* Validação final do funcionamento.
