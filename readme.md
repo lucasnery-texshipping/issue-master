@@ -82,10 +82,24 @@ O sistema segue uma arquitetura leve focada em Prova de Conceito (PoC):
 ## 🚀 Como Executar o Projeto
 
 ### Pré-requisitos
-* Python 3.8+
-* Chave de API do Google Gemini (Google AI Studio)
 
 ### 1. Clonar o repositório
+```bash
+git clone [https://github.com/seu-usuario/issuemaster.git](https://github.com/seu-usuario/issuemaster.git)
+cd issuemaster
+
+* **Python 3.8+** instalado.
+* **Chave de API do Google Gemini** (Obtida no [Google AI Studio](https://aistudio.google.com/)).
+
+---
+
+## 🚀 Guia de Instalação e Execução
+
+Siga os passos abaixo sequencialmente no seu terminal para configurar o ambiente.
+
+### 1. Clonar o repositório
+Baixe o código para sua máquina e entre na pasta do projeto:
+
 ```bash
 git clone [https://github.com/seu-usuario/issuemaster.git](https://github.com/seu-usuario/issuemaster.git)
 cd issuemaster
