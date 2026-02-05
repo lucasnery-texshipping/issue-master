@@ -83,23 +83,62 @@ O sistema segue uma arquitetura leve focada em Prova de Conceito (PoC):
 
 ### Pré-requisitos
 
-### 1. Clonar o repositório
-```bash
-git clone [https://github.com/seu-usuario/issuemaster.git](https://github.com/seu-usuario/issuemaster.git)
-cd issuemaster
-
 * **Python 3.8+** instalado.
 * **Chave de API do Google Gemini** (Obtida no [Google AI Studio](https://aistudio.google.com/)).
 
----
-
-## 🚀 Guia de Instalação e Execução
-
-Siga os passos abaixo sequencialmente no seu terminal para configurar o ambiente.
-
 ### 1. Clonar o repositório
-Baixe o código para sua máquina e entre na pasta do projeto:
 
 ```bash
 git clone [https://github.com/seu-usuario/issuemaster.git](https://github.com/seu-usuario/issuemaster.git)
-cd issuemaster
+cd issuemaster 
+```
+
+
+### 2. Criar e ativar o ambiente virtual
+
+```bash
+# Cria o ambiente virtual
+python -m venv venv
+```
+
+Ativação do ambiente virtual:
+```bash
+# Windows
+.\venv\Scripts\Activate
+
+# Mac / Linux
+source venv/bin/activate
+```
+
+### 3. Instalar as dependências
+Com o ambiente virtual ativado, instale as bibliotecas necessárias:
+
+```bash
+pip install fastapi 
+pip install uvicorn 
+pip install pydantic 
+pip install google-generativeai
+```
+
+### 4. Configuração obrigatória da API Key
+Para que a IA funcione corretamente, é necessário configurar sua chave do Google Gemini.
+
+1 - Abra o arquivo:
+```bash
+backend/main.py
+```
+
+2 - Localize a configuração dentro do arquivo main.py e cole sua chave de API:
+
+```bash
+API_KEY = "COLOQUE A CHAVE DA API AQUI" 
+```
+
+
+### 5. Rodar o servidor
+Com tudo configurado, inicie o backend:
+
+```bash
+cd backend
+uvicorn main:app --reload
+```
