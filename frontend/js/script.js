@@ -6,6 +6,7 @@ async function avaliarChamado() {
     const btn = document.getElementById("btnAvaliar");
     const loading = document.getElementById("loadingArea");
     const resultado = document.getElementById("resultadoArea");
+    const emptyResult = document.getElementById("emptyResultArea");
 
     // Validação simples
     if (!textoDescricao.trim() || textoDescricao.length < 10) {
@@ -18,6 +19,7 @@ async function avaliarChamado() {
     btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Analisando...';
     loading.classList.remove("d-none");
     resultado.classList.add("d-none");
+    emptyResult.classList.add("d-none");
 
     try {
         // --- INÍCIO DA REQUISIÇÃO AO BACKEND ---
@@ -55,6 +57,7 @@ async function avaliarChamado() {
 
 function exibirResultados(data) {
     const resultadoArea = document.getElementById("resultadoArea");
+    const emptyResult = document.getElementById("emptyResultArea");
     const badgeNota = document.getElementById("badgeNota");
     const barraProgresso = document.getElementById("barraProgresso");
     const textoFeedback = document.getElementById("textoFeedback");
@@ -71,7 +74,7 @@ function exibirResultados(data) {
     else corClasse = "bg-success";              // 8-10: Completo
 
     // Atualiza Badge e Barra
-    badgeNota.className = `badge rounded-pill fs-5 ${corClasse}`;
+    badgeNota.className = `badge rounded-pill fs-6 ${corClasse}`;
     barraProgresso.className = `progress-bar ${corClasse.replace("text-dark", "")}`; // Remove text-dark da barra
     barraProgresso.style.width = `${nota * 10}%`;
 
@@ -93,7 +96,8 @@ function exibirResultados(data) {
         listaSugestoes.appendChild(li);
     }
 
-    // Mostra a área final
+    // Mostra a área final e esconde a vazia
+    emptyResult.classList.add("d-none");
     resultadoArea.classList.remove("d-none");
     // Scroll suave até o resultado
     resultadoArea.scrollIntoView({ behavior: 'smooth' });

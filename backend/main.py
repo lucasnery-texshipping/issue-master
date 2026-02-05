@@ -8,7 +8,7 @@ import os
 
 # --- CONFIGURAÇÃO DA IA ---
 # Substitua pela sua API KEY real do Google AI Studio
-API_KEY = "INSERIR-API-KEY-AQUI" 
+API_KEY = "COLOQUE A CHAVE DA API AQUI" 
 
 genai.configure(api_key=API_KEY)
 
