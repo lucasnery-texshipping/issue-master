@@ -142,3 +142,9 @@ Com tudo configurado, inicie o backend:
 cd backend
 uvicorn main:app --reload
 ```
+
+### 6. Executar o Frontend
+Execute o arquivo index.html que está dentro da pasta frontend usando algum navegador.
+```bash
+frontend/index.html
+```
