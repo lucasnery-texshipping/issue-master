@@ -5,15 +5,22 @@ from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import json
 import os
+from dotenv import load_dotenv
 
-# --- CONFIGURAÇÃO DA IA ---
-# Substitua pela sua API KEY real do Google AI Studio
-API_KEY = "COLOQUE A CHAVE DA API AQUI" 
+# 1. Carrega as variáveis do arquivo .env
+load_dotenv()
 
+# 2. Pega a chave de forma segura
+API_KEY = os.getenv("GEMINI_API_KEY")
+
+# Verifica se a chave foi carregada (boa prática para debug)
+if not API_KEY:
+    raise ValueError("A chave da API não foi encontrada! Verifique o arquivo .env")
+
+# Entregamos a chave para a biblioteca do Google
 genai.configure(api_key=API_KEY)
 
 # Configuração do Modelo
-# Usamos o 'gemini-1.5-flash' por ser rápido e gratuito para testes
 model = genai.GenerativeModel(
     model_name="models/gemini-flash-latest",
     generation_config={

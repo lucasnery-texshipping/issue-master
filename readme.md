@@ -114,26 +114,30 @@ source venv/bin/activate
 Com o ambiente virtual ativado, instale as bibliotecas necessárias:
 
 ```bash
+pip install fastapi uvicorn pydantic google-generativeai python-dotenv
+```
+Caso tenha algum problema, faça a instalação de 1 por 1 conforme o exemplo abaixo:
+
+```bash
 pip install fastapi 
 pip install uvicorn 
 pip install pydantic 
 pip install google-generativeai
+pip install python-dotenv
 ```
 
 ### 4. Configuração obrigatória da API Key
 Para que a IA funcione corretamente, é necessário configurar sua chave do Google Gemini.
+Para proteger sua chave de API, utilizamos variáveis de ambiente.
 
-1 - Abra o arquivo:
-```bash
-backend/main.py
-```
+1 - Na raiz do projeto (fora da pasta backend), crie um arquivo chamado exatamente .env (sem nome antes do ponto).
 
-2 - Localize a configuração dentro do arquivo main.py e cole sua chave de API:
+2 - Abra este arquivo com um editor de texto e adicione sua chave no seguinte formato:
 
 ```bash
-API_KEY = "COLOQUE A CHAVE DA API AQUI" 
+GEMINI_API_KEY=cole_sua_chave_aqui_sem_aspas
 ```
-
+Atenção: Não use aspas e não coloque espaços antes ou depois do sinal de igual.
 
 ### 5. Rodar o servidor
 Com tudo configurado, inicie o backend:
