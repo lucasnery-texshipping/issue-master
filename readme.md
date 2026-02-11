@@ -119,6 +119,7 @@ pip install fastapi uvicorn pydantic google-generativeai python-dotenv
 Caso tenha algum problema, faça a instalação de 1 por 1 conforme o exemplo abaixo:
 
 ```bash
+pip install requests
 pip install fastapi 
 pip install uvicorn 
 pip install pydantic 

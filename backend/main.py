@@ -1,35 +1,19 @@
-import google.generativeai as genai
+import requests
+import os
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
-import json
-import os
 from dotenv import load_dotenv
 
-# 1. Carrega as variáveis do arquivo .env
+# 1. Carrega variáveis de ambiente
 load_dotenv()
 
-# 2. Pega a chave de forma segura
-API_KEY = os.getenv("GEMINI_API_KEY")
+# Pega a URL do n8n
+N8N_WEBHOOK_URL = os.getenv("N8N_WEBHOOK_URL")
 
-# Verifica se a chave foi carregada (boa prática para debug)
-if not API_KEY:
-    raise ValueError("A chave da API não foi encontrada! Verifique o arquivo .env")
-
-# Entregamos a chave para a biblioteca do Google
-genai.configure(api_key=API_KEY)
-
-# Configuração do Modelo
-model = genai.GenerativeModel(
-    model_name="models/gemini-flash-latest",
-    generation_config={
-        "response_mime_type": "application/json" # Força a IA a responder SEMPRE em JSON
-    }
-)
-
-# --- INICIALIZAÇÃO DO APP ---
-app = FastAPI(title="IssueMaster API")
+# --- INICIALIZAÇÃO DA API ---
+app = FastAPI(title="IssueMaster Proxy -> n8n")
 
 app.add_middleware(
     CORSMiddleware,
@@ -42,61 +26,43 @@ app.add_middleware(
 class ChamadoInput(BaseModel):
     descricao: str
 
-# --- PROMPT DO SISTEMA (A "Alma" do Agente) ---
-def criar_prompt(descricao_usuario):
-    return f"""
-    Você é o IssueMaster, um especialista em Triagem de TI. 
-    Sua missão é avaliar a qualidade da descrição de um chamado técnico.
-
-    Analise a seguinte descrição enviada pelo usuário:
-    ---
-    "{descricao_usuario}"
-    ---
-
-    Critérios de Avaliação (Verifique se existem):
-    1. Contexto (Qual equipamento? Qual sistema?)
-    2. O Problema (O que está acontecendo exatemente?)
-    3. Evidências (Mensagens de erro, prints, códigos)
-    4. Momento (Quando começou?)
-    5. Impacto (Impede o trabalho? É urgente?)
-
-    Regras de Pontuação (0 a 10):
-    - 0-4: Descrição vaga, impossível de resolver sem perguntar mais.
-    - 5-7: Dá para entender, mas faltam detalhes cruciais.
-    - 8-10: Perfeito, técnico tem tudo para resolver.
-
-    SAÍDA ESPERADA (Formato JSON):
-    {{
-        "nota": (número float, ex: 8.5),
-        "feedback":String curta explicando o porquê da nota,
-        "sugestoes": [Lista de strings com perguntas para o usuário melhorar o chamado ou testes básicos para ele fazer]
-    }}
-    
-    Responda apenas com o JSON.
-    """
-
-# --- ROTAS ---
-
+# --- ROTA PRINCIPAL ---
 @app.post("/analisar_chamado")
 def analisar_chamado(chamado: ChamadoInput):
-    print(f"Recebido: {chamado.descricao}")
+    print(f"📥 Recebido do Front: {chamado.descricao}")
+
+    # Validação de segurança básica
+    if not N8N_WEBHOOK_URL:
+        raise HTTPException(status_code=500, detail="URL do n8n não configurada no servidor.")
 
     try:
-        # 1. Envia o prompt para o Gemini
-        response = model.generate_content(criar_prompt(chamado.descricao))
+        # 1. Envia o texto para o n8n (POST)
+        print("📡 Enviando para o n8n...")
         
-        # 2. Pega o texto da resposta
-        resposta_json = response.text
-        print("Resposta da IA:", resposta_json) # Log para debug
+        # Enviamos um JSON simples: {"descricao": "texto do usuario"}
+        response = requests.post(
+            N8N_WEBHOOK_URL, 
+            json={"descricao": chamado.descricao},
+            timeout=40 # Tempo limite de espera (40s) para a IA pensar
+        )
+        
+        # Verifica se o n8n retornou erro (ex: 404, 500)
+        response.raise_for_status()
+        
+        # 2. Pega a resposta do n8n (que já deve vir no formato JSON correto)
+        dados_n8n = response.json()
+        print("🤖 Resposta recebida do n8n:", dados_n8n)
 
-        # 3. Converte string JSON para dicionário Python
-        dados_processados = json.loads(resposta_json)
+        # 3. Devolve direto para o Frontend
+        return dados_n8n
 
-        return dados_processados
-
+    except requests.exceptions.Timeout:
+        raise HTTPException(status_code=504, detail="O n8n demorou muito para responder.")
+    except requests.exceptions.ConnectionError:
+        raise HTTPException(status_code=502, detail="Não foi possível conectar ao n8n. Verifique se ele está rodando.")
     except Exception as e:
-        print(f"Erro ao chamar Gemini: {e}")
-        raise HTTPException(status_code=500, detail="Erro interno ao processar a IA.")
+        print(f"Erro: {e}")
+        raise HTTPException(status_code=500, detail="Erro interno ao processar solicitação.")
 
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)
